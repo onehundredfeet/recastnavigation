@@ -90,8 +90,14 @@ void rcContext::log(const rcLogCategory category, const char* format, ...) {
     doLog(category, msg, len);
 }
 
-rcHeightfield* rcAllocHeightfield() {
-    return rcNew<rcHeightfield>(RC_ALLOC_PERM);
+void rcContext::doResetLog()
+{
+	// Defined out of line to fix the weak v-tables warning
+}
+
+rcHeightfield* rcAllocHeightfield()
+{
+	return rcNew<rcHeightfield>(RC_ALLOC_PERM);
 }
 rcHeightfield::rcHeightfield()
     : width(0), height(0), bmin(), bmax(), cs(), ch(), spans(nullptr), pools(nullptr), freelist(nullptr) {
