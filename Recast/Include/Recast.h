@@ -306,6 +306,7 @@ struct rcHeightfield
 	rcSpanPool* pools;	///< Linked list of span pools.
 	rcSpan* freelist;	///< The next free span.
 
+	void dispose();
 private:
 	// Explicitly-disabled copy constructor and copy assignment operator.
 	rcHeightfield(const rcHeightfield&);
@@ -350,6 +351,8 @@ struct rcCompactHeightfield
 	rcCompactSpan* spans;		///< Array of spans. [Size: #spanCount]
 	unsigned short* dist;		///< Array containing border distance data. [Size: #spanCount]
 	unsigned char* areas;		///< Array containing area id data. [Size: #spanCount]
+
+	void dispose();
 };
 
 /// Represents a heightfield layer within a layer set.
@@ -382,6 +385,7 @@ struct rcHeightfieldLayerSet
 	~rcHeightfieldLayerSet();
 	rcHeightfieldLayer* layers;			///< The layers in the set. [Size: #nlayers]
 	int nlayers;						///< The number of layers in the set.
+	void dispose();
 };
 
 /// Represents a simple, non-overlapping contour in field space.
