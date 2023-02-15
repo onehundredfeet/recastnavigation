@@ -307,6 +307,7 @@ struct rcHeightfield
 	rcSpan* freelist;	///< The next free span.
 
 	void dispose();
+	void reset();
 private:
 	// Explicitly-disabled copy constructor and copy assignment operator.
 	rcHeightfield(const rcHeightfield&);

@@ -101,6 +101,28 @@ rcHeightfield::~rcHeightfield() {
     dispose();
 }
 
+void rcHeightfield::reset() {
+
+    freelist = nullptr;
+    auto *pool = pools;
+    while (pool) {
+       // Add new items to the free list.
+		rcSpan* fl = this->freelist;
+		rcSpan* head = &pool->items[0];
+		rcSpan* it = &pool->items[RC_SPANS_PER_POOL];
+		do
+		{
+			--it;
+			it->next = fl;
+			fl = it;
+		}
+		while (it != head);
+		this->freelist = it;
+        pool = pool->next;
+    }
+    memset(spans, 0, sizeof(rcSpan*) * width * height);
+}
+
 void rcHeightfield::dispose() {
     // Delete span array.
     rcFree(spans);
@@ -112,6 +134,7 @@ void rcHeightfield::dispose() {
         pools = next;
     }
     pools = nullptr;
+    freelist = nullptr;
 }
 void rcFreeHeightField(rcHeightfield* hf) {
     rcDelete(hf);
@@ -277,16 +300,26 @@ bool rcCreateHeightfield(rcContext* ctx, rcHeightfield& hf, int width, int heigh
                          float cs, float ch) {
     rcIgnoreUnused(ctx);
 
+    if (hf.spans != nullptr && hf.width == width && hf.height == height) {
+        // Reuse spans.
+        
+    } else {
+        // Allocate new spans.
+        rcFree(&hf.spans);
+        hf.spans = (rcSpan**)rcAlloc(sizeof(rcSpan*) * width * height, RC_ALLOC_PERM);
+        if (!hf.spans) {
+            ctx->log(RC_LOG_ERROR, "rcCreateHeightfield: Out of memory 'spans' (%d).", width * height);
+            return false;
+        }
+        memset(hf.spans, 0, sizeof(rcSpan*) * width * height);
+    }
+
     hf.width = width;
     hf.height = height;
     rcVcopy(hf.bmin, bmin);
     rcVcopy(hf.bmax, bmax);
     hf.cs = cs;
     hf.ch = ch;
-    hf.spans = (rcSpan**)rcAlloc(sizeof(rcSpan*) * hf.width * hf.height, RC_ALLOC_PERM);
-    if (!hf.spans)
-        return false;
-    memset(hf.spans, 0, sizeof(rcSpan*) * hf.width * hf.height);
     return true;
 }
 
