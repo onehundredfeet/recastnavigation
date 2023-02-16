@@ -94,7 +94,7 @@ rcHeightfield* rcAllocHeightfield() {
     return rcNew<rcHeightfield>(RC_ALLOC_PERM);
 }
 rcHeightfield::rcHeightfield()
-    : width(), height(), bmin(), bmax(), cs(), ch(), spans(), pools(), freelist() {
+    : width(0), height(0), bmin(), bmax(), cs(), ch(), spans(nullptr), pools(nullptr), freelist(nullptr) {
 }
 
 rcHeightfield::~rcHeightfield() {
@@ -161,10 +161,10 @@ rcCompactHeightfield::rcCompactHeightfield()
       bmax(),
       cs(),
       ch(),
-      cells(),
-      spans(),
-      dist(),
-      areas() {
+      cells(nullptr),
+      spans(nullptr),
+      dist(nullptr),
+      areas(nullptr) {
 }
 rcCompactHeightfield::~rcCompactHeightfield() {
     dispose();
@@ -302,10 +302,10 @@ bool rcCreateHeightfield(rcContext* ctx, rcHeightfield& hf, int width, int heigh
 
     if (hf.spans != nullptr && hf.width == width && hf.height == height) {
         // Reuse spans.
-        
+//        printf("Reusing spans\n");
     } else {
         // Allocate new spans.
-        rcFree(&hf.spans);
+        rcFree(hf.spans);
         hf.spans = (rcSpan**)rcAlloc(sizeof(rcSpan*) * width * height, RC_ALLOC_PERM);
         if (!hf.spans) {
             ctx->log(RC_LOG_ERROR, "rcCreateHeightfield: Out of memory 'spans' (%d).", width * height);
